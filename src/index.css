@@ -1,0 +1,77 @@
+/* index.css */
+
+/* Ensure Tailwind directives are at the top */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can keep your custom styles below */
+body {
+  @apply m-0 font-sans bg-background text-text flex justify-center items-center h-screen;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Container */
+.container {
+  @apply w-full max-w-[400px] p-5;
+}
+
+/* Signup Card */
+.signup-card {
+  @apply bg-card-background p-7 rounded-lg shadow-lg text-center;
+}
+
+/* Header */
+h2 {
+  @apply mb-5 text-primary;
+}
+
+/* Form Group */
+.form-group {
+  @apply mb-4 text-left;
+}
+
+/* Label */
+label {
+  @apply text-sm mb-1 block text-opacity-80;
+  color: rgba(255, 255, 255, 0.8); /* Tailwind doesn't support lighten directly, use rgba instead */
+}
+
+/* Input Fields */
+input {
+  @apply w-full p-2.5 my-1 border border-border rounded-md bg-card-background text-text text-sm;
+}
+
+/* Input Focus */
+input:focus {
+  @apply outline-none border-primary ring-2 ring-opacity-50;
+}
+
+/* Button */
+.btn {
+  @apply w-full p-2.5 bg-primary text-background border-none rounded-md text-lg cursor-pointer transition duration-300 ease-in-out;
+}
+
+.btn:hover {
+  @apply bg-opacity-90;
+}
+
+/* Login Prompt */
+.login-prompt {
+  @apply mt-4 text-sm text-opacity-80;
+  color: rgba(255, 255, 255, 0.8); /* Same as label color */
+}
+
+/* Login Button */
+.login-btn {
+  @apply text-primary font-semibold cursor-pointer transition duration-300 ease-in-out;
+}
+
+.login-btn:hover {
+  @apply text-opacity-90;
+}
