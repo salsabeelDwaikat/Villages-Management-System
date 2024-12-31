@@ -1,0 +1,98 @@
+@primary-color: #76c7c0;
+@background-color: #1e1e2f;
+@card-background: #2c2c3d;
+@text-color: #ffffff;
+@border-color: #444;
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: @background-color;
+    color: @text-color;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.signup-card {
+    background: @card-background;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: @primary-color;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+    color: lighten(@text-color, 30%);
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid @border-color;
+    border-radius: 5px;
+    background: darken(@card-background, 5%);
+    color: @text-color;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: @primary-color;
+    box-shadow: 0 0 5px rgba(118, 199, 192, 0.5);
+}
+
+.btn {
+    width: 100%;
+    padding: 10px;
+    background: @primary-color;
+    color: @background-color;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: darken(@primary-color, 10%);
+}
+
+.login-prompt {
+    margin-top: 15px;
+    font-size: 14px;
+    color: lighten(@text-color, 30%);
+}
+
+.login-btn {
+    color: @primary-color;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.login-btn:hover {
+    color: darken(@primary-color, 10%);
+}

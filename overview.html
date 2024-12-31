@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overview Page</title>
+    <link rel="stylesheet/less" href="overview.less">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/less@4.1.3/dist/less.min.js"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Map Section -->
+        <section class="map-section">
+            <h2>Overview</h2>
+            <div id="map" style="height: 400px;"></div> <!-- Map container with height -->
+        </section>
+
+        <!-- Cards Section -->
+        <section class="stats-section">
+            <div class="card">Total Villages: <span id="totalVillages">120</span></div>
+            <div class="card">Total Urban Areas: <span id="totalUrban">35</span></div>
+            <div class="card">Total Population: <span id="totalPopulation">3,200,000</span></div>
+            <div class="card">Average Land Area: <span id="avgLand">45 sq km<sup>2</sup></span></div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="chart-container">
+                <h3>Age Distribution</h3>
+                <canvas id="agePieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Gender Ratio</h3>
+                <canvas id="genderPieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Population Distribution</h3>
+                <canvas id="histogramChart"></canvas>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Initialize Map
+        const map = L.map('map').setView([31.963, 35.203], 8); // Coordinates for Palestine (latitude, longitude) and zoom level
+
+        // Add a tile layer (using OpenStreetMap as the map provider)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Optionally, add a marker for a specific location within Palestine (example: Bethlehem)
+        L.marker([31.7054, 35.2024]).addTo(map)
+            .bindPopup('<b>Welcome to Bethlehem!</b><br>This is a popular city in Palestine.')
+            .openPopup();
+
+        // Age Distribution Pie Chart
+        const agePieCtx = document.getElementById('agePieChart').getContext('2d');
+        new Chart(agePieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['0-18 years', '19-35 years', '36-60 years', '60+ years'],
+                datasets: [{
+                    label: 'Age Distribution',
+                    data: [30, 35, 25, 10],  // Example data
+                    backgroundColor: ['#76c7c0', '#3498db', '#f39c12', '#e74c3c']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Gender Ratio Pie Chart
+        const genderPieCtx = document.getElementById('genderPieChart').getContext('2d');
+        new Chart(genderPieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Male', 'Female'],
+                datasets: [{
+                    label: 'Gender Ratio',
+                    data: [48, 52],  // Example data
+                    backgroundColor: ['#3498db', '#e74c3c']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Histogram Chart Data (Population Distribution)
+        const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+        new Chart(histogramCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Village A', 'Village B', 'Village C', 'Village D', 'Village E'],
+                datasets: [{
+                    label: 'Population Size',
+                    data: [500, 1500, 1200, 800, 300],  // Example data
+                    backgroundColor: '#3498db'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Villages'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Population Size'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+@primary-color: #3498db;
+@secondary-color: #76c7c0;
+@card-background: #1e1e1e;
+@text-color: #ffffff;
+@background-color: #121212;
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: @background-color;
+    color: @text-color;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.map-section, .stats-section, .charts-section {
+    margin-bottom: 30px;
+}
+
+h2, h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: @primary-color;
+}
+
+#map {
+    width: 100%;
+    height: 300px;
+    border: 2px solid @primary-color;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #333;
+    text-align: center;
+    line-height: 300px;
+    color: @text-color;
+}
+
+.stats-section {
+    display: flex; 
+    justify-content: space-between;  
+    flex-wrap: wrap;  
+    gap: 5px;  
+}
+
+.card {
+    background: @card-background;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    width: 22%;  /* Set a percentage width for cards to fit in a row */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 15px;  /* Space at the bottom between cards if they wrap */
+}
+
+
+.card span {
+    font-size: 1.2em;
+    color: @secondary-color;
+    font-weight: bold;
+}
+
+.charts-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    background: @card-background;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: @text-color;
+}
+
+.chart-container h3 {
+    margin-bottom: 20px;
+    color: @primary-color;
+}
+
+canvas {
+    width: 100%;
+    height: 400px;
+}
