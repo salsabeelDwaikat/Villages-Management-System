@@ -4,7 +4,6 @@ function Search({ setSearchText }) {
   const handleSearchChange = (event) => {
     setSearchText(event.target.value); 
   };
-
   return (
     <div className="mb-4">
       <input
