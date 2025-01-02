@@ -1,6 +1,7 @@
 import React from 'react';
 function AdminList({ admins, setActiveChat }) {
   return (
+    
     <div className="bg-gray-800 p-4 rounded-lg">
       <h2 className="text-xl font-semibold text-white mb-4">Available Admins</h2>
       <div className="grid grid-cols-3 gap-4">

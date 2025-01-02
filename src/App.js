@@ -4,7 +4,6 @@ import Search from './Search';
 import AdminList from './AdminList';
 import Chat from './Chat';
 
-
 function App() {
   const [activeAdmin, setActiveAdmin] = useState(null);
   const [searchText, setSearchText] = useState(''); 

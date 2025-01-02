@@ -5,4 +5,5 @@ const App = () => {
   return <Gallery />;
 };
 
+
 export default App;

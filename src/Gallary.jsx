@@ -7,7 +7,6 @@ const Gallery = () => {
       description: 'Bethlehem, a historic Palestinian village located west of Jerusalem. It is famous for its ancient history and the events of the Nakba that destroyed the village in 1948.',
     },
     {
-      
       imageUrl: '/images/image2.jpg',
       description: 'Jabalia, a city in the northern Gaza Strip, known for its high population density and the large refugee camp that bears its name.',
     },
