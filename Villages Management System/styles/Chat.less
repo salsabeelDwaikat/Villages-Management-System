@@ -1,0 +1,116 @@
+@background-color: #1b1b2b;
+@text-color: #fff;
+@input-background: #fff;
+@input-color: darkgray;
+@header-padding: 3px;
+@section-padding: 10px;
+@button-background: #007bff;
+@button-border-radius: 50px;
+
+body {
+    background-color: @background-color;
+    color: @text-color;
+    font-family: 'Roboto', sans-serif;
+
+    header {
+        padding: @header-padding;
+        text-align: left;
+    }
+
+    .search-bar {
+        padding: @header-padding;
+        text-align: left;
+        margin-bottom: @header-padding;
+
+        input {
+            padding: 10px;
+            border-radius: 10px;
+            width: 600px;
+            border: none;
+            background-color: @input-background;
+            color: @input-color;
+        }
+    }
+
+    .available-admins {
+        padding: @section-padding;
+        text-align: left;
+        margin-top: @section-padding;
+        background-color: #2c2c3d;
+
+        .admin {
+            display: inline-block;
+            margin: 10px;
+            text-align: left;
+            cursor: pointer;
+
+            img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+            }
+
+            p {
+                margin-top: 5px;
+            }
+        }
+    }
+
+    .chat-section {
+        padding: @section-padding;
+        display: none;
+
+        &.active {
+            display: block;
+        }
+
+        .chat-messages {
+            height: 100px;
+            overflow-y: scroll;
+            background-color: #2c2c3d;
+
+            .admin-message {
+                background-color: #333;
+                text-align: left;
+            }
+        }
+
+        .message {
+            margin: 5px;
+            padding: 5px;
+            border-radius: 5px;
+
+            &.user-message,
+            &.admin-message {
+                background-color: #333;
+                text-align: left;
+            }
+        }
+
+        .message-input {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            justify-content: flex-end;
+
+            input {
+                flex: 1;
+                padding: 30px;
+                border-radius: 5px;
+                border: none;
+                background-color: @input-background;
+                color: @input-color;
+            }
+
+            button {
+                padding: 10px 20px;
+                background-color: @button-background;
+                color: @text-color;
+                border: none;
+                border-radius: @button-border-radius;
+                cursor: pointer;
+                align-self: center;
+            }
+        }
+    }
+}

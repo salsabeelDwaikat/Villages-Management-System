@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <link rel="stylesheet/less" href="/styles/Gallary.less">
+    <link rel="stylesheet/less" href="/styles/dashboard.less">
+    <script src="https://cdn.jsdelivr.net/npm/less@4.1.3/dist/less.min.js"></script>
+</head>
+<body>
+    <!-- Sidebar container -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main content -->
+    <div class="content">
+        <header>
+            <button id="addNewImage">Add New Image</button>
+        </header>
+
+        <div class="image-grid">
+            <!-- Images will be dynamically populated here -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/sidebar-loader.js"></script>
+    <script src="/js/Gallary.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Admins</title>
+    <link rel="stylesheet/less" href="/styles/Chat.less">
+    <link rel="stylesheet/less" href="/styles/dashboard.less">
+    <script src="https://cdn.jsdelivr.net/npm/less@4.1.3/dist/less.min.js"></script>
+</head>
+<body>
+    <!-- Sidebar container -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main content -->
+    <div class="content">
+        <header>
+            <h1>Chat with Admins</h1>
+        </header>
+
+        <section class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search for an admin.....">
+        </section>
+
+        <section class="available-admins">
+            <h2>Available Admins</h2>
+            <div class="admin-list" id="adminList"></div>
+        </section>
+
+        <section class="chat-section" id="chatSection">
+            <h2>Chat with: <span id="adminName"></span></h2>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="message-input">
+                <input type="text" id="messageInput" placeholder="Type your message.....">
+                <button id="sendMessageButton">Send</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/sidebar-loader.js"></script>
+    <script src="/js/Chat.js"></script>
+</body>
+</html>
