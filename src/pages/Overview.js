@@ -32,7 +32,6 @@ const Overview = () => {
         console.log('Gender Data:', genderResponse.data);
         setGenderData(genderResponse.data);
     
-        // Fetch map data
         const mapResponse = await axios.get('http://localhost:5000/api/overview/map-data');
         console.log('Map Data:', mapResponse.data);
         setMapData(mapResponse.data);
