@@ -13,33 +13,55 @@ const Overview = () => {
   const [genderData, setGenderData] = useState([]);
   const [mapData, setMapData] = useState([]);
 
-  // Fetch data from the backend
+  // Fetch data from the backend using GraphQL
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch population data
-        const populationResponse = await axios.get('http://localhost:5000/api/overview/population');
-        console.log('Population Data:', populationResponse.data);
-        setPopulationData(populationResponse.data);
-    
-        // Fetch age distribution data
-        const ageResponse = await axios.get('http://localhost:5000/api/overview/age-distribution');
-        console.log('Age Data:', ageResponse.data);
-        setAgeData(ageResponse.data);
-    
-        // Fetch gender ratio data
-        const genderResponse = await axios.get('http://localhost:5000/api/overview/gender-ratio');
-        console.log('Gender Data:', genderResponse.data);
-        setGenderData(genderResponse.data);
-    
-        const mapResponse = await axios.get('http://localhost:5000/api/overview/map-data');
-        console.log('Map Data:', mapResponse.data);
-        setMapData(mapResponse.data);
+        // Fetch all data in a single GraphQL query
+        const response = await axios.post('http://localhost:5000/graphql', {
+          query: `
+            query {
+              populationData {
+                name
+                population
+              }
+              ageDistribution {
+                ageGroup
+                total
+              }
+              genderRatio {
+                gender
+                total
+              }
+              mapData {
+                name
+                coordinates {
+                  lat
+                  lng
+                }
+              }
+            }
+          `,
+        });
+
+        // Check for errors in the GraphQL response
+        if (response.data.errors) {
+          throw new Error(response.data.errors[0].message);
+        }
+
+        // Extract data from the response
+        const { populationData, ageDistribution, genderRatio, mapData } = response.data.data;
+
+        // Set state with the fetched data
+        setPopulationData(populationData);
+        setAgeData(ageDistribution);
+        setGenderData(genderRatio);
+        setMapData(mapData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -68,6 +90,7 @@ const Overview = () => {
       },
     ],
   };
+
   // Format gender ratio data for the chart
   const genderChartData = {
     labels: genderData.map(group => group.gender),
@@ -79,6 +102,7 @@ const Overview = () => {
       },
     ],
   };
+
   // Default map center (first village's coordinates)
   const mapCenter = mapData.length > 0 ? [mapData[0].coordinates.lat, mapData[0].coordinates.lng] : [32.2211, 35.2544];
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import axios from 'axios'; 
+import axios from 'axios';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -19,25 +19,39 @@ const Login = () => {
     }
 
     try {
-      // Send a POST request to the backend login endpoint
-      const response = await axios.post('http://localhost:5000/api/auth/signin', {
-        username,
-        password,
+      // Send a POST request to the GraphQL endpoint
+      const response = await axios.post('http://localhost:5000/graphql', {
+        query: `
+          mutation {
+            signin(username: "${username}", password: "${password}") {
+              token
+              user {
+                id
+                username
+                role
+              }
+            }
+          }
+        `,
       });
 
-      // If login is successful, store the token in localStorage
-      const { token } = response.data;
+      // Check for errors in the GraphQL response
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+
+      // Extract the token and user data from the response
+      const { token, user } = response.data.data.signin;
+
+      // Store the token in localStorage
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user)); // Store user data if needed
 
       // Redirect to the overview page
       navigate('/overview');
     } catch (err) {
       // Handle errors (e.g., invalid credentials, server issues)
-      if (err.response && err.response.data.error) {
-        setError(err.response.data.error); // Display error message from the backend
-      } else {
-        setError('An error occurred during login. Please try again.');
-      }
+      setError(err.message || 'An error occurred during login. Please try again.');
     }
   };
 

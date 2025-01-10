@@ -34,23 +34,33 @@ const SignUp = () => {
     }
 
     try {
-      // Send a POST request to the backend sign-up endpoint
-      const response = await axios.post('http://localhost:5000/api/auth/signup', {
-        username,
-        password,
-        role: 'user', // Default role is 'user'
+      // Send a POST request to the GraphQL endpoint
+      const response = await axios.post('http://localhost:5000/graphql', {
+        query: `
+          mutation {
+            signup(username: "${username}", password: "${password}", role: "user") {
+              token
+              user {
+                id
+                username
+                role
+              }
+            }
+          }
+        `,
       });
 
+      // Check for errors in the GraphQL response
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+
       // If sign-up is successful, redirect to the login page
-      console.log('User created:', response.data);
+      console.log('User created:', response.data.data.signup);
       navigate('/login');
     } catch (err) {
       // Handle errors (e.g., username already exists, server issues)
-      if (err.response && err.response.data.error) {
-        setError(err.response.data.error); // Display error message from the backend
-      } else {
-        setError('Failed to create user. Please try again.');
-      }
+      setError(err.message || 'Failed to create user. Please try again.');
       console.error('Sign-up error:', err);
     }
   };
