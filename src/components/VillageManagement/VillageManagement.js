@@ -4,6 +4,8 @@ import Sidebar from '../Sidebar/Sidebar';
 import AddVillage from '../AddVillage/AddVillage';
 import UpdateVillage from '../UpdateVillage/UpdateVillage';
 import AddDemo from '../AddDemo/AddDemo';
+import Swal from 'sweetalert2';
+
 
 const VillageManagement = () => {
   const [villages, setVillages] = useState([]);
@@ -17,7 +19,7 @@ const VillageManagement = () => {
   });
   const [currentVillage, setCurrentVillage] = useState(null);
 
-  // جلب القرى من Backend
+  // Fetch villages from the backend
   useEffect(() => {
     const fetchVillages = async () => {
       try {
@@ -52,36 +54,49 @@ const VillageManagement = () => {
     fetchVillages();
   }, []);
 
-  // دالة حذف القرية
+  // Delete a village
   const handleDeleteVillage = async (id) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this village?');
-    if (!confirmDelete) return;
-
-    try {
-      const response = await axios.post('http://localhost:5000/graphql', {
-        query: `
-          mutation {
-            deleteVillage(id: "${id}") {
-              id
-              name
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.post('http://localhost:5000/graphql', {
+          query: `
+            mutation {
+              deleteVillage(id: "${id}") {
+                id
+                name
+              }
             }
-          }
-        `,
-      });
-
-      if (response.data.errors) {
-        throw new Error(response.data.errors[0].message);
+          `,
+        });
+  
+        if (response.data.errors) {
+          throw new Error(response.data.errors[0].message);
+        }
+  
+       
+        const updatedVillages = villages.filter((v) => v.id !== id);
+        setVillages(updatedVillages);
+  
+        Swal.fire('Deleted!', 'The village has been deleted.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'An error occurred while deleting the village.', 'error');
+        console.error('Error deleting village:', error);
       }
-
-      // تحديث القائمة بعد الحذف
-      const updatedVillages = villages.filter((v) => v.id !== id);
-      setVillages(updatedVillages);
-    } catch (error) {
-      console.error('Error deleting village:', error);
     }
   };
 
-  // دالة تحديث القرية
+  // Update a village
   const handleUpdateVillage = (updatedVillage) => {
     const updatedVillages = villages.map((v) =>
       v.id === updatedVillage.id ? updatedVillage : v
@@ -90,7 +105,7 @@ const VillageManagement = () => {
     setModalState({ ...modalState, update: false });
   };
 
-  // عرض القرى
+  // Render villages
   const renderVillages = () => {
     let filteredVillages = [...villages];
 
@@ -149,7 +164,7 @@ const VillageManagement = () => {
     ));
   };
 
-  // دالة إضافة قرية جديدة
+  // Add a new village
   const handleAddVillage = (village) => {
     setVillages([...villages, village]);
     setModalState({ ...modalState, addVillage: false });
@@ -216,7 +231,18 @@ const VillageManagement = () => {
               <p className="text-white mb-4"><strong>Latitude:</strong> {currentVillage.coordinates.lat}</p>
               <p className="text-white mb-4"><strong>Longitude:</strong> {currentVillage.coordinates.lng}</p>
               <p className="text-white mb-4"><strong>Tags:</strong> {currentVillage.tags}</p>
-              <div className="text-white mb-4"><strong>Village Image:</strong> <span className="italic">[Image Placeholder]</span></div>
+              
+          
+              <div className="text-white mb-4">
+                <strong>Village Image:</strong>
+                <img
+                  src="https://i.imgur.com/qYjNLOv.jpeg" 
+                  alt="Default Village"
+                  className="mt-2 rounded-lg"
+                  style={{ width: '100%', height: 'auto' }}
+                />
+              </div>
+
               <button
                 className="bg-gray-600 text-white px-4 py-1 rounded hover:bg-gray-700"
                 onClick={() => setModalState({ ...modalState, view: false })}
@@ -228,25 +254,25 @@ const VillageManagement = () => {
         )}
 
         {/* Update Modal */}
-{modalState.update && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <UpdateVillage
-      handleClose={() => setModalState({ ...modalState, update: false })}
-      village={currentVillage}
-      onUpdate={handleUpdateVillage}
-    />
-  </div>
-)}
+        {modalState.update && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <UpdateVillage
+              handleClose={() => setModalState({ ...modalState, update: false })}
+              village={currentVillage}
+              onUpdate={handleUpdateVillage}
+            />
+          </div>
+        )}
 
-
-{modalState.addDemo && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <AddDemo
-      handleClose={() => setModalState({ ...modalState, addDemo: false })}
-      villageId={currentVillage.id} // تمرير معرف القرية
-    />
-  </div>
-)}
+        {/* Add Demographic Data Modal */}
+        {modalState.addDemo && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <AddDemo
+              handleClose={() => setModalState({ ...modalState, addDemo: false })}
+              villageId={currentVillage.id} // Pass village ID
+            />
+          </div>
+        )}
       </div>
     </div>
   );

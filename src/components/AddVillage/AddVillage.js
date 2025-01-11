@@ -32,7 +32,20 @@ const AddVillage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    // Check if required fields are empty
+    if (
+      !village.name ||
+      !village.population ||
+      !village.landArea ||
+      !village.latitude ||
+      !village.longitude ||
+      !village.urbanAreas
+    ) {
+      setMessage('Please fill in all required fields.');
+      return;
+    }
+
     const graphqlQuery = {
       query: `
         mutation AddVillage($name: String!, $population: Int!, $landArea: Float!, $urbanAreas: Int!, $coordinates: CoordinatesInput!) {
@@ -53,14 +66,14 @@ const AddVillage = () => {
         }
       }
     };
-  
+
     try {
       const response = await axios.post('http://localhost:5000/graphql', graphqlQuery, {
         headers: {
           'Content-Type': 'application/json',
         }
       });
-  
+
       setMessage('Village added successfully!');
       setVillage({
         name: '',
@@ -68,7 +81,9 @@ const AddVillage = () => {
         landArea: '',
         latitude: '',
         longitude: '',
-        urbanAreas: ''
+        urbanAreas: '',
+        image: null,
+        tags: ''
       });
     } catch (error) {
       console.error('Error adding village:', error.response ? error.response.data : error.message);
