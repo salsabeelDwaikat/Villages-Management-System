@@ -1,30 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { gql, useQuery, useMutation } from '@apollo/client';
+
+const GET_IMAGES = gql`
+  query GetImages {
+    images {
+      id
+      imageUrl
+      description
+    }
+  }
+`;
+
+const ADD_IMAGE = gql`
+  mutation AddImage($imageUrl: String!, $description: String!) {
+    addImage(input: { imageUrl: $imageUrl, description: $description }) {
+      id
+      imageUrl
+      description
+    }
+  }
+`;
 
 const Gallery = () => {
-  const [images, setImages] = useState([
-    {
-      imageUrl: '/images/image1.jpg',
-      description: 'Bethlehem, a historic Palestinian village located west of Jerusalem. It is famous for its ancient history and the events of the Nakba that destroyed the village in 1948.',
-    },
-    {
-      imageUrl: '/images/image2.jpg',
-      description: 'Jabalia, a city in the northern Gaza Strip, known for its high population density and the large refugee camp that bears its name.',
-    },
-    {
-      imageUrl: '/images/image3.jpg',
-      description: 'Hebron, a historic city in the southern West Bank, is famous for the Ibrahimi Mosque, its traditional markets, and its handicrafts.',
-    },
-    {
-      imageUrl: '/images/image4.jpg',
-      description: 'Jerusalem, a holy city located in the heart of Palestine, considered a spiritual and historical center for the three heavenly religions.',
-    },
-    {
-      imageUrl: '/images/image5.jpg',
-      description: 'Shejaiya, one of the oldest and largest neighborhoods in Gaza City. It is distinguished by its ancient history and cultural and social status.',
-    },
-  ]);
+  const { loading, error, data } = useQuery(GET_IMAGES);
+  const [addImage] = useMutation(ADD_IMAGE, {
+    refetchQueries: [{ query: GET_IMAGES }],
+  });
 
-  const addNewImage = () => {
+  const handleAddImage = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
@@ -39,10 +42,9 @@ const Gallery = () => {
           const newImageUrl = e.target.result;
           const newImageDescription = prompt('Enter the image description:');
           if (newImageDescription) {
-            setImages([
-              ...images,
-              { imageUrl: newImageUrl, description: newImageDescription.trim() },
-            ]);
+            addImage({
+              variables: { imageUrl: newImageUrl, description: newImageDescription },
+            });
           } else {
             alert('Image description is required.');
           }
@@ -52,23 +54,16 @@ const Gallery = () => {
     });
   };
 
+  if (loading) return <p className="text-white text-center py-4">Loading...</p>;
+  if (error) return <p className="text-red-500 text-center py-4">Error: {error.message}</p>;
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <header className="flex justify-between items-center p-6 bg-gray-800 shadow-lg">
-        <h1 className="text-lg font-bold">Image Gallery</h1>
-        <button
-          className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition"
-          onClick={addNewImage}
-        >
-          Add New Image
-        </button>
-      </header>
-
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {images.map((image, index) => (
+        {data.images.map((image) => (
           <div
-            key={index}
-            className="bg-gray-700 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition"
+            key={image.id}
+            className="bg-gray-700 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition transform hover:scale-105"
           >
             <img
               src={image.imageUrl}
@@ -84,6 +79,12 @@ const Gallery = () => {
           </div>
         ))}
       </div>
+      <button
+        className="fixed bottom-4 right-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition"
+        onClick={handleAddImage}
+      >
+        Add New Image
+      </button>
     </div>
   );
 };

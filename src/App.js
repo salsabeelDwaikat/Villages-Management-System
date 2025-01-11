@@ -1,39 +1,43 @@
 import React, { useState } from 'react';
-import Sidebar from './Sidebar';
-import Search from './Search';
-import AdminList from './AdminList';
-import Chat from './Chat';
+import Sidebar from './components/Sidebar';
+import Search from './components/Search';
+import AdminList from './components/AdminList';
+import Chat from './components/Chat';
+import Gallery from './components/Gallery';
 
 function App() {
   const [activeAdmin, setActiveAdmin] = useState(null);
-  const [searchText, setSearchText] = useState(''); 
-
-  const admins = [
-    { name: 'Salsabeel', image: '/images/admin1.jpg' },
-    { name: 'Najwa', image: '/images/admin2.jpg' },
-    { name: 'Alaa', image: '/images/admin3.jpg' }
-  ];
-
-  const filteredAdmins = admins.filter((admin) =>
-    admin.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const [searchText, setSearchText] = useState('');
+  const [showGallery, setShowGallery] = useState(false);
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-900 text-white">
+      {/* Sidebar */}
       <Sidebar />
-      <div className="flex-1 bg-[#1b1b2b] p-4">
+
+      {/* Main Content */}
+      <div className="flex-1 p-4">
         <header className="p-3 text-left">
-          <h1 className="text-white text-2xl">Chat with Admins</h1>
+          <h1 className="text-2xl font-bold">
+            {showGallery ? 'Image Gallery' : 'Chat with Admins'}
+          </h1>
+          <button
+            className="mt-2 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition"
+            onClick={() => setShowGallery(!showGallery)}
+          >
+            {showGallery ? 'Go to Chat' : 'Go to Gallery'}
+          </button>
         </header>
 
-        {}
-        <Search setSearchText={setSearchText} />
-
-        {}
-        <AdminList admins={filteredAdmins} setActiveChat={setActiveAdmin} />
-
-        {}
-        {activeAdmin && <Chat admin={activeAdmin} />}
+        {showGallery ? (
+          <Gallery />
+        ) : (
+          <>
+            <Search setSearchText={setSearchText} />
+            <AdminList setActiveChat={setActiveAdmin} />
+            {activeAdmin && <Chat admin={activeAdmin} />}
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,36 +1,58 @@
 import React, { useState } from 'react';
+import { gql, useQuery, useMutation } from '@apollo/client';
+
+const GET_MESSAGES = gql`
+  query GetMessages {
+    messages {
+      id
+      sender
+      text
+      timestamp
+    }
+  }
+`;
+
+const SEND_MESSAGE = gql`
+  mutation SendMessage($text: String!, $sender: String!) {
+    addMessage(input: { text: $text, sender: $sender }) {
+      id
+      text
+      sender
+      timestamp
+    }
+  }
+`;
 
 function Chat({ admin }) {
-  const [messages, setMessages] = useState([
-    { sender: 'admin', text: `Hello! How can I assist you today?` },
-  ]);
   const [messageInput, setMessageInput] = useState('');
+  const { loading, error, data } = useQuery(GET_MESSAGES);
+  const [sendMessage] = useMutation(SEND_MESSAGE, {
+    refetchQueries: [{ query: GET_MESSAGES }],
+  });
 
   const handleSendMessage = () => {
     if (messageInput.trim()) {
-      setMessages([
-        ...messages,
-        { sender: 'user', text: `You: ${messageInput}` },
-      ]);
+      sendMessage({ variables: { text: messageInput, sender: 'user' } });
       setMessageInput('');
     }
   };
+
+  if (loading) return <p className="text-white text-center py-4">Loading...</p>;
+  if (error) return <p className="text-red-500 text-center py-4">Error: {error.message}</p>;
 
   return (
     <div className="bg-gray-700 p-6 rounded-lg mt-6">
       <h2 className="text-xl font-semibold text-white">Chat with: {admin.name}</h2>
       <div className="my-4 h-64 overflow-y-auto bg-gray-800 p-4 rounded-lg">
-        {messages.map((message, index) => (
+        {data.messages.map((message) => (
           <div
-            key={index}
-            className={`${
-              message.sender === 'user' ? 'text-right' : 'text-left'
-            }`}
+            key={message.id}
+            className={`${message.sender === 'user' ? 'text-right' : 'text-left'} mb-2`}
           >
             <p
-              className={`${
-                message.sender === 'user' ? 'text-green-400' : 'text-blue-400'
-              }`}
+              className={`inline-block p-2 rounded-lg ${
+                message.sender === 'user' ? 'bg-green-500' : 'bg-blue-500'
+              } text-white`}
             >
               {message.text}
             </p>
@@ -55,6 +77,5 @@ function Chat({ admin }) {
     </div>
   );
 }
-
 
 export default Chat;
