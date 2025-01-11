@@ -1,20 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const UpdateVillage = ({ handleClose }) => {
-  const [villageName, setVillageName] = useState('Jabalia');
-  const [region, setRegion] = useState('');
-  const [landArea, setLandArea] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
+const UpdateVillage = ({ handleClose, village, onUpdate }) => {
+  const [villageName, setVillageName] = useState(village ? village.name : '');
+  const [region, setRegion] = useState(village ? village.region : '');
+  const [landArea, setLandArea] = useState(village ? village.landArea : '');
+  const [latitude, setLatitude] = useState(village ? village.coordinates.lat : '');
+  const [longitude, setLongitude] = useState(village ? village.coordinates.lng : '');
   const [image, setImage] = useState(null);
+
+  useEffect(() => {
+    if (village) {
+      setVillageName(village.name);
+      setRegion(village.region || '');
+      setLandArea(village.landArea || '');
+      setLatitude(village.coordinates.lat || '');
+      setLongitude(village.coordinates.lng || '');
+    }
+  }, [village]);
 
   const handleImageUpload = (e) => {
     setImage(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
+
+    try {
+      const response = await axios.post('http://localhost:5000/graphql', {
+        query: `
+          mutation {
+            updateVillage(id: "${village.id}", updates: {
+              name: "${villageName}",
+              population: ${village.population || 0},
+              landArea: ${landArea || 0},
+              urbanAreas: ${village.urbanAreas || 0},
+              coordinates: {
+                lat: ${latitude || 0},
+                lng: ${longitude || 0}
+              }
+            }) {
+              id
+              name
+              population
+              landArea
+              urbanAreas
+              coordinates {
+                lat
+                lng
+              }
+            }
+          }
+        `,
+      });
+
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+
+      // تحديث القائمة في الواجهة الأمامية
+      onUpdate(response.data.data.updateVillage);
+      handleClose(); // إغلاق النافذة بعد التحديث
+    } catch (error) {
+      console.error('Error updating village:', error);
+    }
   };
 
   return (

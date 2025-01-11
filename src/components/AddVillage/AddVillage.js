@@ -4,10 +4,11 @@ import axios from 'axios';
 const AddVillage = () => {
   const [village, setVillage] = useState({
     name: '',
-    region: '',
+    population: '',
     landArea: '',
     latitude: '',
     longitude: '',
+    urbanAreas: '',
     image: null,
     tags: ''
   });
@@ -31,37 +32,46 @@ const AddVillage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const formData = new FormData();
-      formData.append('name', village.name);
-      formData.append('region', village.region);
-      formData.append('landArea', village.landArea);
-      formData.append('latitude', village.latitude);
-      formData.append('longitude', village.longitude);
-      if (village.image) {
-        formData.append('image', village.image);
+  
+    const graphqlQuery = {
+      query: `
+        mutation AddVillage($name: String!, $population: Int!, $landArea: Float!, $urbanAreas: Int!, $coordinates: CoordinatesInput!) {
+          addVillage(name: $name, population: $population, landArea: $landArea, urbanAreas: $urbanAreas, coordinates: $coordinates) {
+            id
+            name
+          }
+        }
+      `,
+      variables: {
+        name: village.name,
+        population: parseInt(village.population),
+        landArea: parseFloat(village.landArea),
+        urbanAreas: parseInt(village.urbanAreas),
+        coordinates: {
+          lat: parseFloat(village.latitude),
+          lng: parseFloat(village.longitude)
+        }
       }
-      formData.append('tags', village.tags.split(',').map(tag => tag.trim()));
-
-      const response = await axios.post('http://localhost:3000/api/villages', formData, {
+    };
+  
+    try {
+      const response = await axios.post('http://localhost:5000/graphql', graphqlQuery, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+          'Content-Type': 'application/json',
+        }
       });
-
-      setMessage(response.data.message);
+  
+      setMessage('Village added successfully!');
       setVillage({
         name: '',
-        region: '',
+        population: '',
         landArea: '',
         latitude: '',
         longitude: '',
-        image: null,
-        tags: ''
+        urbanAreas: ''
       });
     } catch (error) {
-      console.error('Error adding village:', error);
+      console.error('Error adding village:', error.response ? error.response.data : error.message);
       setMessage('Failed to add village. Please try again.');
     }
   };
@@ -83,12 +93,12 @@ const AddVillage = () => {
           />
         </div>
         <div className="mb-1">
-          <label className="block text-white mb-1" htmlFor="region">Region/District:</label>
+          <label className="block text-white mb-1" htmlFor="population">Population:</label>
           <input
             type="text"
-            id="region"
-            name="region"
-            value={village.region}
+            id="population"
+            name="population"
+            value={village.population}
             onChange={handleChange}
             className="w-full p-1 border border-gray-300 rounded"
           />
@@ -122,6 +132,17 @@ const AddVillage = () => {
             id="longitude"
             name="longitude"
             value={village.longitude}
+            onChange={handleChange}
+            className="w-full p-1 border border-gray-300 rounded"
+          />
+        </div>
+        <div className="mb-1">
+          <label className="block text-white mb-1" htmlFor="urbanAreas">Urban Areas:</label>
+          <input
+            type="text"
+            id="urbanAreas"
+            name="urbanAreas"
+            value={village.urbanAreas}
             onChange={handleChange}
             className="w-full p-1 border border-gray-300 rounded"
           />

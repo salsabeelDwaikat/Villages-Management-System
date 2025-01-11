@@ -1,19 +1,49 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
-const AddDemo = ({ handleClose }) => {
-  const [populationSize, setPopulationSize] = useState('');
-  const [ageDistribution, setAgeDistribution] = useState('');
-  const [genderRatios, setGenderRatios] = useState('');
-  const [populationGrowthRate, setPopulationGrowthRate] = useState('');
+const AddDemo = ({ handleClose, villageId }) => {
+  const [ageGroup, setAgeGroup] = useState('');
+  const [gender, setGender] = useState('');
+  const [count, setCount] = useState('');
 
-  const handleAddData = () => {
-    // Handle the data submission logic here
-    console.log({
-      populationSize,
-      ageDistribution,
-      genderRatios,
-      populationGrowthRate,
-    });
+  const handleAddData = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/graphql',
+        {
+          query: `
+            mutation {
+              addPopulationData(
+                villageId: "${villageId}",
+                ageGroup: "${ageGroup}",
+                gender: "${gender}",
+                count: ${parseInt(count)}
+              ) {
+                id
+                villageId
+                ageGroup
+                gender
+                count
+              }
+            }
+          `,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json', 
+          },
+        }
+      );
+
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+
+      console.log('Data added successfully:', response.data.data.addPopulationData);
+      handleClose(); // إغلاق النافذة بعد الإضافة
+    } catch (error) {
+      console.error('Error adding demographic data:', error);
+    }
   };
 
   return (
@@ -21,39 +51,30 @@ const AddDemo = ({ handleClose }) => {
       <div className="bg-gray-900 text-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-xl font-semibold mb-4">Add Demographic Data for Jabalia</h2>
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Population Size:</label>
+          <label className="block text-sm font-medium mb-1">Age Group (e.g., 0-18):</label>
           <input
             type="text"
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded"
-            value={populationSize}
-            onChange={(e) => setPopulationSize(e.target.value)}
+            value={ageGroup}
+            onChange={(e) => setAgeGroup(e.target.value)}
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Age Distribution (e.g., 0-14: 30%, 15-64: 60%, 65+: 10%):</label>
+          <label className="block text-sm font-medium mb-1">Gender (e.g., Male, Female):</label>
           <input
             type="text"
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded"
-            value={ageDistribution}
-            onChange={(e) => setAgeDistribution(e.target.value)}
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Gender Ratios (e.g., Male: 51%, Female: 49%):</label>
+          <label className="block text-sm font-medium mb-1">Count:</label>
           <input
-            type="text"
+            type="number"
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded"
-            value={genderRatios}
-            onChange={(e) => setGenderRatios(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Population Growth Rate:</label>
-          <input
-            type="text"
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded"
-            value={populationGrowthRate}
-            onChange={(e) => setPopulationGrowthRate(e.target.value)}
+            value={count}
+            onChange={(e) => setCount(e.target.value)}
           />
         </div>
         <button

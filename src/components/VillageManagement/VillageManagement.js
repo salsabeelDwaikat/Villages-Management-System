@@ -1,58 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
 import AddVillage from '../AddVillage/AddVillage';
 import UpdateVillage from '../UpdateVillage/UpdateVillage';
 import AddDemo from '../AddDemo/AddDemo';
 
 const VillageManagement = () => {
-  const [villages, setVillages] = useState([
-    {
-      name: 'Jabalia - Gaza Strip',
-      region: 'Gaza Strip',
-      landArea: 10,
-      latitude: '31.9522',
-      longitude: '35.2034',
-      image: null,
-      tags: 'Example Tag',
-    },
-    {
-      name: 'Beit Lahia - Gaza Strip',
-      region: 'Gaza Strip',
-      landArea: 20,
-      latitude: '31.5400',
-      longitude: '34.5153',
-      image: null,
-      tags: 'Example Tag',
-    },
-    {
-      name: 'Quds - West Bank',
-      region: 'West Bank',
-      landArea: 30,
-      latitude: '31.7767',
-      longitude: '35.2345',
-      image: null,
-      tags: 'Example Tag',
-    },
-    {
-      name: 'Shejaiya - Gaza Strip',
-      region: 'Gaza Strip',
-      landArea: 25,
-      latitude: '31.5123',
-      longitude: '34.4556',
-      image: null,
-      tags: 'Example Tag',
-    },
-    {
-      name: 'Hebron - West Bank',
-      region: 'West Bank',
-      landArea: 40,
-      latitude: '31.5244',
-      longitude: '35.1107',
-      image: null,
-      tags: 'Example Tag',
-    },
-  ]);
-
+  const [villages, setVillages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('default');
   const [modalState, setModalState] = useState({
@@ -63,6 +17,80 @@ const VillageManagement = () => {
   });
   const [currentVillage, setCurrentVillage] = useState(null);
 
+  // جلب القرى من Backend
+  useEffect(() => {
+    const fetchVillages = async () => {
+      try {
+        const response = await axios.post('http://localhost:5000/graphql', {
+          query: `
+            query {
+              villages {
+                id
+                name
+                population
+                landArea
+                urbanAreas
+                coordinates {
+                  lat
+                  lng
+                }
+              }
+            }
+          `,
+        });
+
+        if (response.data.errors) {
+          throw new Error(response.data.errors[0].message);
+        }
+
+        setVillages(response.data.data.villages);
+      } catch (error) {
+        console.error('Error fetching villages:', error);
+      }
+    };
+
+    fetchVillages();
+  }, []);
+
+  // دالة حذف القرية
+  const handleDeleteVillage = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this village?');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await axios.post('http://localhost:5000/graphql', {
+        query: `
+          mutation {
+            deleteVillage(id: "${id}") {
+              id
+              name
+            }
+          }
+        `,
+      });
+
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+
+      // تحديث القائمة بعد الحذف
+      const updatedVillages = villages.filter((v) => v.id !== id);
+      setVillages(updatedVillages);
+    } catch (error) {
+      console.error('Error deleting village:', error);
+    }
+  };
+
+  // دالة تحديث القرية
+  const handleUpdateVillage = (updatedVillage) => {
+    const updatedVillages = villages.map((v) =>
+      v.id === updatedVillage.id ? updatedVillage : v
+    );
+    setVillages(updatedVillages);
+    setModalState({ ...modalState, update: false });
+  };
+
+  // عرض القرى
   const renderVillages = () => {
     let filteredVillages = [...villages];
 
@@ -76,9 +104,9 @@ const VillageManagement = () => {
       filteredVillages.sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    return filteredVillages.map((village, index) => (
+    return filteredVillages.map((village) => (
       <div
-        key={index}
+        key={village.id}
         className="flex justify-between items-center p-4 bg-gray-800 rounded-lg mb-2 shadow-md"
       >
         <span className="text-white font-medium">{village.name}</span>
@@ -103,10 +131,7 @@ const VillageManagement = () => {
           </button>
           <button
             className="bg-gray-600 text-white px-4 py-1 rounded hover:bg-gray-700"
-            onClick={() => {
-              const updatedVillages = villages.filter((_, i) => i !== index);
-              setVillages(updatedVillages);
-            }}
+            onClick={() => handleDeleteVillage(village.id)}
           >
             Delete Village
           </button>
@@ -124,6 +149,7 @@ const VillageManagement = () => {
     ));
   };
 
+  // دالة إضافة قرية جديدة
   const handleAddVillage = (village) => {
     setVillages([...villages, village]);
     setModalState({ ...modalState, addVillage: false });
@@ -187,8 +213,8 @@ const VillageManagement = () => {
               <p className="text-white mb-4"><strong>Village Name:</strong> {currentVillage.name}</p>
               <p className="text-white mb-4"><strong>Region/District:</strong> {currentVillage.region}</p>
               <p className="text-white mb-4"><strong>Land Area (sq km):</strong> {currentVillage.landArea}</p>
-              <p className="text-white mb-4"><strong>Latitude:</strong> {currentVillage.latitude}</p>
-              <p className="text-white mb-4"><strong>Longitude:</strong> {currentVillage.longitude}</p>
+              <p className="text-white mb-4"><strong>Latitude:</strong> {currentVillage.coordinates.lat}</p>
+              <p className="text-white mb-4"><strong>Longitude:</strong> {currentVillage.coordinates.lng}</p>
               <p className="text-white mb-4"><strong>Tags:</strong> {currentVillage.tags}</p>
               <div className="text-white mb-4"><strong>Village Image:</strong> <span className="italic">[Image Placeholder]</span></div>
               <button
@@ -202,18 +228,25 @@ const VillageManagement = () => {
         )}
 
         {/* Update Modal */}
-        {modalState.update && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <UpdateVillage handleClose={() => setModalState({ ...modalState, update: false })} />
-          </div>
-        )}
+{modalState.update && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <UpdateVillage
+      handleClose={() => setModalState({ ...modalState, update: false })}
+      village={currentVillage}
+      onUpdate={handleUpdateVillage}
+    />
+  </div>
+)}
 
-        {/* Add Demo Modal */}
-        {modalState.addDemo && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <AddDemo handleClose={() => setModalState({ ...modalState, addDemo: false })} />
-          </div>
-        )}
+
+{modalState.addDemo && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <AddDemo
+      handleClose={() => setModalState({ ...modalState, addDemo: false })}
+      villageId={currentVillage.id} // تمرير معرف القرية
+    />
+  </div>
+)}
       </div>
     </div>
   );
